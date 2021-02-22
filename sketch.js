@@ -6,6 +6,8 @@ var fish1, fish2, fish3;
 var plasticGroup;
 var fishGroup;
 var player, player_img;
+var plasticArray = []
+var score = 0;
 function preload(){
   ocean_img = loadImage("images/ocean_image.png");
   plastic_img = loadImage("images/plastic_image.png")
@@ -19,8 +21,6 @@ function preload(){
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  
- plasticGroup = new Group();
  fishGroup = new Group();
  ocean = createSprite(0,0,width, 100);
  ocean.scale = 1.8
@@ -34,39 +34,50 @@ function setup() {
 
 function draw() {
   background(0);  
+  console.log(score);
   if(ocean.y > -350){
     ocean.y = height/2;
   }
-  if(plasticGroup.isTouching(fishGroup)){
-    fishGroup.destroyEach();
-  }
   if(keyDown(UP_ARROW)){
-    player.y = player.y - 4;
+    player.y = player.y - 5;
   }
   if(keyDown(RIGHT_ARROW)){
-    player.x = player.x + 4;
+    player.x = player.x + 5;
   }
   if(keyDown(DOWN_ARROW)){
-    player.y = player.y + 4;
+    player.y = player.y + 5;
   }
   if(keyDown(LEFT_ARROW)){
-    player.x = player.x - 4;
+    player.x = player.x - 5;
   }
+    if (plasticArray !== []) {
+        for (var i = 0; i < plasticArray.length; i++) {
+            if (player.isTouching(plasticArray[i])) {
+                plasticArray[i].destroy();
+                score = score + 10;
+            }
+        }
+  
+}
   spawnFish();
   spawnPlastic();
   drawSprites();
+  textSize(20)
+  stroke("Green");
+  text("Score: " + score, 80,80)
 }
 
 function spawnPlastic(){
   if(frameCount% 90 === 0){
-    plastic = createSprite(100,100,50,50);
+    plastic = createSprite(100,100,50,50)
     plastic.scale = 0.1
     plastic.addImage(plastic_img);
-    plastic.y = Math.round(random(30,height-100))
+    plastic.y = Math.round(random(30,height-300))
     plastic.x = Math.round(random(200,width - 80))
-    plastic.lifetime = 500;
+    plastic.lifetime = 400;
     plastic.velocityY = 2
-    plasticGroup.add(plastic);
+    plasticArray.push(plastic);
+    console.log(plasticArray);
   }
 }
 function spawnFish(){

@@ -8,6 +8,9 @@ var fishGroup;
 var player, player_img;
 var plasticArray = []
 var score = 0;
+var fishArray = []
+var gameState = "play"
+var reset, reset_img;
 function preload(){
   ocean_img = loadImage("images/ocean_image.png");
   plastic_img = loadImage("images/plastic_image.png")
@@ -15,6 +18,7 @@ function preload(){
   fish2 = loadImage("images/red_fish.png")
   fish3 = loadImage("images/small_fish.png")
   player_img = loadImage("images/player_image.png")
+  reset_img = loadImage("images/reset_button.png")
 
 
 }
@@ -22,19 +26,23 @@ function preload(){
 function setup() {
   createCanvas(windowWidth, windowHeight);
  fishGroup = new Group();
- ocean = createSprite(0,0,width, 100);
+ ocean = createSprite(0,0,width, height);
  ocean.scale = 1.8
  ocean.addImage(ocean_img);
- ocean.velocityY = -1;
  ocean.y = height/2;
  player = createSprite(width/2, height-100, 50,50);
  player.scale = 0.2;
  player.addImage(player_img);
+ reset = createSprite(width/2, height/2 + 10, 50, 50);
+ reset.addImage(reset_img);
+ reset.scale = 0.3
+ reset.visible = false;
 }
 
 function draw() {
   background(0);  
   console.log(score);
+if (gameState === "play"){
   if(ocean.y > -350){
     ocean.y = height/2;
   }
@@ -57,14 +65,40 @@ function draw() {
                 score = score + 10;
             }
         }
-  
+      
+}
+if (fishArray !== []) {
+  for (var i = 0; i < fishArray.length; i++) {
+      if (player.isTouching(fishArray[i])) {
+          fishArray[i].destroy();
+          score = score - 50;
+      }
+  }
+
+}
+if (score < 0) {
+  gameState = "end"
 }
   spawnFish();
-  spawnPlastic();
   drawSprites();
+  spawnPlastic();
+}
+else if (gameState === "end") {
+  textSize(50)
+  stroke("Red")
+  text("You Lose!", width/2, height/2)
+  if(mousePressedOver(reset)){
+    restart()
+  }
+}
   textSize(20)
   stroke("Green");
   text("Score: " + score, 80,80)
+}
+function restart(){
+  score = 0;
+  gameState = "play";
+  reset.visible = false
 }
 
 function spawnPlastic(){
@@ -97,6 +131,6 @@ function spawnFish(){
       break
       default : break
     }
-    fishGroup.add(fish)
+    fishArray.push(fish);
   }
 }
